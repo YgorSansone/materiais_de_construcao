@@ -1,5 +1,5 @@
 <?PHP
-require_once("/config/conexaodb.php");
+require_once("config/conexaodb.php");
 ?>
 
 <!DOCTYPE html>
