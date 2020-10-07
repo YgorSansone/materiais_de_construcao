@@ -9,12 +9,13 @@ require_once("config/conexaodb.php");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body>
     <p>Select local CSV File:</p>
     <input id="csv" type="file">
-
+    <div class="resultado" id="resultado"></div>
     <output id="out">
         file contents will appear here
     </output>
@@ -49,9 +50,31 @@ require_once("config/conexaodb.php");
                 }
             }
             obj = Object.fromEntries(map1);
-            result.push(obj);
+            result.add(obj);
             // console.log(obj);
+            sendcsv(result);
             return JSON.stringify(result); //JSON
+        }
+
+        function sendcsv(dados) {
+            // json = JSON.stringify(dados);
+            $.ajax({
+                    url: "consultas/consulta.php",
+                    type: 'post',
+                    data: {val: dados},
+                    beforeSend: function() {
+                        $("#resultado").html("ENVIANDO...");
+                        console.log("enviando");
+                    }
+                })
+                .done(function(msg) {
+                    $("#resultado").html(msg);
+                    console.log(msg);
+                })
+                .fail(function(jqXHR, textStatus, msg) {
+                    alert(msg);
+                    console.log(msg);
+                });
         }
     </script>
 </body>
