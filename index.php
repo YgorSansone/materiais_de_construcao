@@ -35,39 +35,22 @@ require_once("config/conexaodb.php");
 
         fileInput.addEventListener('change', readFile);
 
-        //var csv is the CSV file with headers
         function csvJSON(csv) {
-
             var lines = csv.split("\n");
-
+            // console.log(lines[0]);
             var result = [];
-
-            // var headers=lines[0].split(",");
-            console.log(lines);
-            for (var i = 1; i < lines.length; i++) {
+            var obj = {};
+            const map1 = new Map();
+            for (var i = 0; i < lines.length; i++) {
                 if (lines[i] != "") {
-                    var obj = {};
-                    var currentline = lines[i].split(",");
-                    obj[i] = currentline[0];
-                    for (var j = 0; j < lines.length; j++) {
-                        if (lines[i] != "") {
-                            // obj[0] = currentline[j];
-                        }
-                    }
-
-                    // for(var j=0;j<lines.length;j++){
-                    //     if(lines[i] != ""){
-                    //     obj[currentline[0]] = currentline[j];
-                    //     }
-                    // }
-
-                    result.push(obj);
+                    var quebrando = lines[i].split(",");
+                    map1.set(quebrando[0], quebrando[1]);
+                    // obj[i] = quebrando[0];
                 }
-
-
             }
-
-            //return result; //JavaScript object
+            obj = Object.fromEntries(map1);
+            result.push(obj);
+            // console.log(obj);
             return JSON.stringify(result); //JSON
         }
     </script>
