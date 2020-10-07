@@ -1,19 +1,23 @@
 <?php 
-// if ($_GET['func'] == 'buscar') {
+    function objectToArray($d) {
+        if (is_object($d)) {
+            $d = get_object_vars($d);
+        }
+		
+        if (is_array($d)) {
+            return array_map(__FUNCTION__, $d);
+        }
+        else {
+            return $d;
+        }
+    }
+    
         $obj = json_decode($_POST['val']);
-        echo "<pre>";
-        print_r($_POST['val']);
-        echo "</pre>";
-        echo $_POST['val'];
-        // $obj;
-        // $dados['id_video'] = $obj->id_video;
-        // $dados['id_user'] = $obj->id_user;
-
-        // $retorno = $__cons->ConsultaCursoVideo('%', $obj->id_user, $obj->id_video);
-
-        // $retorno[0]['url'] = $__html->_aws_bucket . $retorno[0]['caminho'];
-
-        // echo json_encode((object)$retorno);
-        //echo json_encode($dados['descricao']);
-// }
+        if (is_object($obj)) {
+                $objj = objectToArray($obj);
+        foreach ($objj as $key => $value) {
+                echo "Nome:{$key}, Quantidade:{$value} </br>";
+                print_r($arr);
+            }
+        }
 ?>
