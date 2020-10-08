@@ -22,8 +22,7 @@ require_once("../config/conexaodb.php");
                 echo "Nome:{$key}, Quantidade:{$value} </br>";
                 array_push($materiais, $key);
                 array_push($quantidade, $value);
-                $SELECT = $_con->prepare("SELECT * FROM deposito WHERE id IN (SELECT codDeposito FROM estoque where codMaterial IN (SELECT id from material WHERE nome = '$key'))");
-                // SELECT * FROM table1 WHERE id IN (SELECT id FROM table2);
+                $SELECT = $_con->prepare("SELECT * FROM deposito WHERE id IN (SELECT codDeposito FROM estoque where codMaterial IN (SELECT id from material WHERE nome = '$key'))ORDER BY nome DESC");
                 print_r($arr);
             }
         }
