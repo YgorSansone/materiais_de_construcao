@@ -34,8 +34,10 @@ require_once("config/conexaodb.php");
   </div>
   </p>
 </div>
-
-    <div class="resultado" id="resultado"></div>
+<div class="text-center">
+  <div class="resultado" id="resultado"></div>
+</div>
+    
     <!-- <output id="out">
         file contents will appear here
     </output> -->

@@ -51,7 +51,7 @@ $.ajax({
         type: 'post',
         data: {val: json},
         beforeSend: function() {
-            $("#resultado").html("ENVIANDO...");
+            $("#resultado").html('<img src="https://olaargentina.com/wp-content/uploads/2019/11/loading-gif-transparent-10.gif" alt="some text"class="rounded">');
             console.log("enviando");
         }
     })
