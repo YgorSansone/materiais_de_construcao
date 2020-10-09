@@ -22,6 +22,7 @@ require_once("config/conexaodb.php");
   <p class="lead">Coloque a sua lista de compras e veja em qual loja terá o melhor preço</p>
   <hr class="my-4">
   <p>Somente arquivos .csv</p>
+  <a href="testecsv.csv" download="testecsv.csv" class="btn btn-dark">Download do teste</a>
   <p class="lead">
     <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
     <div class="d-flex justify-content-center">
