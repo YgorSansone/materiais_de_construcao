@@ -29,7 +29,7 @@ if (is_object($obj)) {
         array_push($materiais, $key);
         array_push($quantidade, $value);
         // $SELECT = $_con->prepare("SELECT * FROM deposito WHERE id IN (SELECT codDeposito FROM estoque where codMaterial IN (SELECT id from material WHERE nome = '$key'))ORDER BY nome DESC");
-        $query_id = "SELECT id from material WHERE nome = '$key'";
+        $query_id = "SELECT id from material WHERE nome LIKE '%$key%'";
         $SELECT_ID_MATERIAL = $_con->prepare($query_id);
         $SELECT_ID_MATERIAL->execute();
         $ids = $SELECT_ID_MATERIAL->fetchAll();
