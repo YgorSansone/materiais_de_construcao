@@ -59,7 +59,7 @@ if (is_object($obj)) {
     }
 }
 $id_materiais = substr($x, 0, -1);
-$size = sizeof($list_id) - 1;
+$size = sizeof($list_id);
 $idDeposito = "";
 
 //Busca a menor soma dos preços dos produtos ordenando do menor para o maior
@@ -160,4 +160,3 @@ echo "<br>";
 echo "<h1>Tabela de preço</h1>";
 echo $tabela . $tabelabody . $tabelafinal;
 echo "<br>";
-?>
