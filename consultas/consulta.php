@@ -95,6 +95,7 @@ $query_preco->execute();
 $resultado_query_preco = $query_preco->fetchAll();
 $list_preco_loja = array();
 //Multiplica os produtos pelo id para ter o preço final
+
 foreach ($resultado_query_preco as $resultado => $index) {
 
     $chave = array_search($index['idmaterial'], $list_id);
@@ -104,6 +105,7 @@ foreach ($resultado_query_preco as $resultado => $index) {
     $chave = array_search($index['idmaterial'], $list_id);
 
     $preco_final[$index['deposito']] += $preco_quantidade;
+    $qtditens[$index['deposito']] += 1;
 
     // echo "<h2>".$index['deposito']."</h2>";
     // echo "<br><strong>".$index['material'].": ".$index['preco']. " -> ".$index['idmaterial'] ."</strong>";
@@ -137,6 +139,8 @@ foreach ($preco_final as $key => $value) {
     $tabela2 .= '<th scope="col">#</th>';
     $tabela2 .= ' <th scope="col">Deposito</th>';
     $tabela2 .= ' <th scope="col">Preço total</th>';
+    $tabela2 .= ' <th scope="col">Qtd itens</th>';
+    $tabela2 .= ' <th scope="col">Qtd que faltam</th>';
     $tabela2 .= '</tr>';
     $tabela2 .= '</thead>';
     $tabela2 .= '<tbody>';
@@ -144,6 +148,10 @@ foreach ($preco_final as $key => $value) {
     $tabelabody2 .= '    <th scope="row">' . $z . '</th>';
     $tabelabody2 .= '    <td>' . $key . '</td>';
     $tabelabody2 .= '    <td>' . $value . '</td>';
+    $falta_itens = $qtditens[$key] - $size;
+    $tabelabody2 .= '    <td>' . $qtditens[$key]. '</td>';
+    $tabelabody2 .= '    <td>' . $falta_itens. '</td>';
+    // qtditens
     $tabelabody2 .= '  </tr>';
     $tabelafinal2 .= '</tbody>';
     $tabelafinal2 .= '</table>';
