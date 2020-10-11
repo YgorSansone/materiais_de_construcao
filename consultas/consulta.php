@@ -21,7 +21,7 @@ $x = "";
 $quantidade = array();
 if (is_object($obj)) {
     $objj = objectToArray($obj);
-    $y = 0;
+    $y = 1;
 
     //acha todos os materiais no banco
     foreach ($objj as $key => $value) {
@@ -38,12 +38,12 @@ if (is_object($obj)) {
             $x .= $id['id'] . ',';
         }
         // print_r("</br>".$value." <=> " . $key);
-        $tabela3 =  '<table class="table table-striped table-dark">';
+        $tabela3 =  '<table class="table table-striped table-dark sortable" id="myTable">';
         $tabela3 .= '<thead>';
         $tabela3 .= ' <tr>';
-        $tabela3 .= '<th scope="col">#</th>';
-        $tabela3 .= ' <th scope="col">Nome</th>';
-        $tabela3 .= ' <th scope="col">Quantidade</th>';
+        $tabela3 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">#</th>';
+        $tabela3 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Nome</th>';
+        $tabela3 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Quantidade</th>';
         $tabela3 .= '</tr>';
         $tabela3 .= '</thead>';
         $tabela3 .= '<tbody>';
@@ -60,25 +60,23 @@ if (is_object($obj)) {
 }
 $id_materiais = substr($x, 0, -1);
 $size = sizeof($list_id);
-$idDeposito = "";
-
+$porc = intval(0.65*$size);
 //Busca a menor soma dos preços dos produtos ordenando do menor para o maior
-$query = "SELECT d.nome as deposito, d.id as idDeposito, SUM(preco) as precoTotal 
-                FROM estoque e
-                JOIN deposito d ON d.id=e.codDeposito
-                JOIN material m ON m.id=e.codMaterial
-                WHERE codMaterial IN ('$id_materiais')
-                GROUP BY codDeposito
-                HAVING COUNT(codMaterial) <= '$size'
-                ORDER BY SUM(preco) ASC";
-
+$query = "SELECT d.nome as deposito,d.id as idDeposito, SUM(preco) as precoTotal 
+FROM estoque e
+JOIN deposito d ON d.id=e.codDeposito
+JOIN material m ON m.id=e.codMaterial
+WHERE codMaterial IN ($id_materiais)
+GROUP BY codDeposito
+HAVING COUNT(codMaterial) >= $porc
+ORDER BY SUM(preco) ASC";
 
 $SELECT = $_con->prepare($query);
 $SELECT->execute();
 $users = $SELECT->fetchAll();
 
 foreach ($users as $user) {
-    //   echo '<br>' . $user['deposito'] . $user['precoTotal'] .$user['idDeposito'] ;
+    // echo '<br>' . $user['deposito'] . $user['precoTotal'] . $user['idDeposito'];
     $idDeposito .= $user['idDeposito'] . ',';
 }
 
@@ -95,33 +93,34 @@ $query_preco->execute();
 $resultado_query_preco = $query_preco->fetchAll();
 $list_preco_loja = array();
 //Multiplica os produtos pelo id para ter o preço final
-
+$itenspordeposito = array();
 foreach ($resultado_query_preco as $resultado => $index) {
 
     $chave = array_search($index['idmaterial'], $list_id);
     $preco_quantidade = $index['preco'] * $quantidade[$chave];
     // echo "</br>". $index['preco'] ." * ". $quantidade[$chave] . " = ".  $preco_quantidade . "</br>";
-
-    $chave = array_search($index['idmaterial'], $list_id);
-
     $preco_final[$index['deposito']] += $preco_quantidade;
     $qtditens[$index['deposito']] += 1;
+    // $arr = (array($index['deposito'], array($index['idmaterial'], $index['material'])));
+    array_push($itenspordeposito, (array($index['deposito'], array($index['idmaterial'], $index['material']))));
+    // array_push($itenspordeposito2, $index['deposito']);
 
     // echo "<h2>".$index['deposito']."</h2>";
     // echo "<br><strong>".$index['material'].": ".$index['preco']. " -> ".$index['idmaterial'] ."</strong>";
-    $tabela =  '<table class="table table-striped table-dark">';
+    $tabela =  '<table class="table table-striped table-dark sortable" id="myTable">';
     $tabela .= '<thead>';
     $tabela .= ' <tr>';
-    $tabela .= '<th scope="col">#</th>';
-    $tabela .= ' <th scope="col">Deposito</th>';
-    $tabela .= ' <th scope="col">Nome</th>';
-    $tabela .= '  <th scope="col">preço unitario</th>';
-    $tabela .= ' <th scope="col">Preço multiplicado</th>';
+    $tabela .= '  <th scope="col" style = "background:none; cursor:pointer; color: #ffff">#</th>';
+    $tabela .= '  <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Deposito</th>';
+    $tabela .= '  <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Nome</th>';
+    $tabela .= '  <th scope="col" style = "background:none; cursor:pointer; color: #ffff">preço unitario</th>';
+    $tabela .= '  <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Preço multiplicado</th>';
     $tabela .= '</tr>';
     $tabela .= '</thead>';
     $tabela .= '<tbody>';
     $tabelabody .= '  <tr>';
-    $tabelabody .= '    <th scope="row">' . $resultado . '</th>';
+    $resultado1 = $resultado +1;
+    $tabelabody .= '    <th scope="row">' . $resultado1 . '</th>';
     $tabelabody .= '    <td>' . $index['deposito'] . '</td>';
     $tabelabody .= '    <td>' . $index['material'] . '</td>';
     $tabelabody .= '    <td>' . $index['preco'] . '</td>';
@@ -130,17 +129,18 @@ foreach ($resultado_query_preco as $resultado => $index) {
     $tabelafinal .= '</tbody>';
     $tabelafinal .= '</table>';
 }
-$z = 0;
+$z = 1;
+asort($preco_final);
 foreach ($preco_final as $key => $value) {
     // print_r("</br>".$value." <=> " . $key);
-    $tabela2 =  '<table class="table table-striped table-dark">';
+    $tabela2 =  '<table class="table table-striped table-dark sortable" id="myTable">';
     $tabela2 .= '<thead>';
     $tabela2 .= ' <tr>';
-    $tabela2 .= '<th scope="col">#</th>';
-    $tabela2 .= ' <th scope="col">Deposito</th>';
-    $tabela2 .= ' <th scope="col">Preço total</th>';
-    $tabela2 .= ' <th scope="col">Qtd itens</th>';
-    $tabela2 .= ' <th scope="col">Qtd que faltam</th>';
+    $tabela2 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">#</th>';
+    $tabela2 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Deposito</th>';
+    $tabela2 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Preço total</th>';
+    $tabela2 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Qtd itens</th>';
+    $tabela2 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Qtd que falta</th>';
     $tabela2 .= '</tr>';
     $tabela2 .= '</thead>';
     $tabela2 .= '<tbody>';
@@ -148,21 +148,26 @@ foreach ($preco_final as $key => $value) {
     $tabelabody2 .= '    <th scope="row">' . $z . '</th>';
     $tabelabody2 .= '    <td>' . $key . '</td>';
     $tabelabody2 .= '    <td>' . $value . '</td>';
-    $falta_itens = $qtditens[$key] - $size;
-    $tabelabody2 .= '    <td>' . $qtditens[$key]. '</td>';
-    $tabelabody2 .= '    <td>' . $falta_itens. '</td>';
+    $falta_itens = ($qtditens[$key] - $size) * -1;
+    if($falta_itens == 0){
+        $falta_itens = "Nenhum";
+    }
+    $tabelabody2 .= '    <td>' . $qtditens[$key] . '</td>';
+    $tabelabody2 .= '    <td>' . $falta_itens . '</td>';
     // qtditens
     $tabelabody2 .= '  </tr>';
     $tabelafinal2 .= '</tbody>';
     $tabelafinal2 .= '</table>';
     $z++;
 }
+//lista de id todos os meus produtos
+//lista de id de todos os protudos que tem em cada deposito (correspondendo a minha lista)
 
 //printa as tabelas
 echo "<h1>Tabela para orçamento</h1>";
 echo $tabela3 . $tabelabody3 . $tabelafinal3;
 echo "<br>";
-echo "<h1>Melhor preço e com o maximo de produto da lista</h1>";
+echo "<h1>Melhor preço e com mais de 65% da lista</h1>";
 echo $tabela2 . $tabelabody2 . $tabelafinal2;
 echo "<br>";
 echo "<h1>Tabela de preço</h1>";
