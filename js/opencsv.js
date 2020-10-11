@@ -7,12 +7,8 @@ $(".custom-file-input").on("change", function () {
 readFile = function () {
     var reader = new FileReader();
     reader.onload = function () {
-        // document.getElementById('out').innerHTML = reader.result;
-        // console.log(reader.result);
-        // console.log(JSON.stringify(reader.result));
         csvJSON(reader.result);
     };
-    // start reading the file. When it is done, calls the onload event defined above.
     reader.readAsText(fileInput.files[0], 'UTF-8');
 };
 
@@ -33,14 +29,16 @@ function csvJSON(csv) {
                 quebrando = lines[i].split('\",');
                 quebrando[0] = quebrando[0].split('\"').pop();
             }
+            quebrando[0] = quebrando[0].toLowerCase();
+            quebrando[0] = quebrando[0][0].toUpperCase() + quebrando[0].substr(1);
             map1.set(quebrando[0], quebrando[1]);
             // obj[i] = quebrando[0];
         }
     }
     obj = Object.fromEntries(map1);
-    result = obj;
+    // result = obj;
     // console.log(obj);
-    sendcsv(result);
+    sendcsv(obj);
     // return JSON.stringify(result); //JSON4
 }
 
@@ -57,6 +55,7 @@ function sendcsv(dados) {
     })
         .done(function (msg) {
             $("#resultado").html(msg);
+            OrdernarTabela();
             // console.log(msg);
         })
         .fail(function (jqXHR, textStatus, msg) {
