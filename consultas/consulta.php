@@ -17,7 +17,6 @@ function objectToArray($d)
 $obj = json_decode($_POST['val']);
 $materiais = array();
 $list_id = array();
-$x = "";
 $quantidade = array();
 if (is_object($obj)) {
     $objj = objectToArray($obj);
@@ -33,9 +32,10 @@ if (is_object($obj)) {
         $SELECT_ID_MATERIAL = $_con->prepare($query_id);
         $SELECT_ID_MATERIAL->execute();
         $ids = $SELECT_ID_MATERIAL->fetchAll();
-        foreach ($ids as $id) {
+        foreach ($ids as $i => $id) {
             array_push($list_id, $id['id']);
             $x .= $id['id'] . ',';
+            $idsMateriais[$i] .= $id['id'] . ',';
         }
         // print_r("</br>".$value." <=> " . $key);
         $tabela3 =  '<table class="table table-striped table-dark sortable" id="myTable">';
@@ -55,12 +55,11 @@ if (is_object($obj)) {
         $tabelafinal3 .= '</tbody>';
         $tabelafinal3 .= '</table>';
         $y++;
-        // print_r($arr);
     }
 }
 $id_materiais = substr($x, 0, -1);
 $size = sizeof($list_id);
-$porc = intval(0.65*$size);
+$porc = intval(0.65 * $size);
 //Busca a menor soma dos preços dos produtos ordenando do menor para o maior
 $query = "SELECT d.nome as deposito,d.id as idDeposito, SUM(preco) as precoTotal 
 FROM estoque e
@@ -93,7 +92,7 @@ $query_preco->execute();
 $resultado_query_preco = $query_preco->fetchAll();
 $list_preco_loja = array();
 //Multiplica os produtos pelo id para ter o preço final
-$itenspordeposito = array();
+// $itenspordeposito = array();
 foreach ($resultado_query_preco as $resultado => $index) {
 
     $chave = array_search($index['idmaterial'], $list_id);
@@ -101,8 +100,8 @@ foreach ($resultado_query_preco as $resultado => $index) {
     // echo "</br>". $index['preco'] ." * ". $quantidade[$chave] . " = ".  $preco_quantidade . "</br>";
     $preco_final[$index['deposito']] += $preco_quantidade;
     $qtditens[$index['deposito']] += 1;
-    // $arr = (array($index['deposito'], array($index['idmaterial'], $index['material'])));
-    array_push($itenspordeposito, (array($index['deposito'], array($index['idmaterial'], $index['material']))));
+    $arr[$index['deposito']] .= $index['idmaterial'] . ',';
+    // array_push($itenspordeposito, $arr);
     // array_push($itenspordeposito2, $index['deposito']);
 
     // echo "<h2>".$index['deposito']."</h2>";
@@ -119,7 +118,7 @@ foreach ($resultado_query_preco as $resultado => $index) {
     $tabela .= '</thead>';
     $tabela .= '<tbody>';
     $tabelabody .= '  <tr>';
-    $resultado1 = $resultado +1;
+    $resultado1 = $resultado + 1;
     $tabelabody .= '    <th scope="row">' . $resultado1 . '</th>';
     $tabelabody .= '    <td>' . $index['deposito'] . '</td>';
     $tabelabody .= '    <td>' . $index['material'] . '</td>';
@@ -149,7 +148,7 @@ foreach ($preco_final as $key => $value) {
     $tabelabody2 .= '    <td>' . $key . '</td>';
     $tabelabody2 .= '    <td>' . $value . '</td>';
     $falta_itens = ($qtditens[$key] - $size) * -1;
-    if($falta_itens == 0){
+    if ($falta_itens == 0) {
         $falta_itens = "Nenhum";
     }
     $tabelabody2 .= '    <td>' . $qtditens[$key] . '</td>';
@@ -162,6 +161,53 @@ foreach ($preco_final as $key => $value) {
 }
 //lista de id todos os meus produtos
 //lista de id de todos os protudos que tem em cada deposito (correspondendo a minha lista)
+$valor = substr($x, 0, -1);
+$ids = explode(",", $valor);
+foreach ($arr as $i => $valor) {
+    $valor = substr($valor, 0, -1);
+    $lista = explode(",", $valor);
+    $result = array_diff($lista, $ids);
+    if (sizeof($ids) > sizeof($lista)) {
+        $diff1 = array_diff($lista, $ids);
+        $diff2 = array_diff($ids, $lista);
+        $listafaltando[$i] = array_merge($diff1, $diff2);
+    }
+}
+foreach ($listafaltando as $key => $value) {
+    foreach ($value as $keyy => $valor) {
+        $query_nome = "SELECT nome from material WHERE id = '$valor'";
+        $SELECT_ID_MATERIAL = $_con->prepare($query_nome);
+        $SELECT_ID_MATERIAL->execute();
+        $ids = $SELECT_ID_MATERIAL->fetchAll();
+        foreach ($ids as $i => $id) {
+            $nomesMateriais[$key] .= $id['nome'] . '@';
+        }
+    }
+}
+$y = 1;
+foreach ($nomesMateriais as $key => $value) {
+    $valor = substr($value, 0, -1);
+    $lista = explode("@", $valor);
+    foreach ($lista as $k => $nomes) {
+        $tabela4 =  '<table class="table table-striped table-dark sortable" id="myTable">';
+        $tabela4 .= '<thead>';
+        $tabela4 .= ' <tr>';
+        $tabela4 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">#</th>';
+        $tabela4 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Deposito</th>';
+        $tabela4 .= ' <th scope="col" style = "background:none; cursor:pointer; color: #ffff">Material</th>';
+        $tabela4 .= '</tr>';
+        $tabela4 .= '</thead>';
+        $tabela4 .= '<tbody>';
+        $tabelabody4 .= '  <tr>';
+        $tabelabody4 .= '    <th scope="row">' . $y . '</th>';
+        $tabelabody4 .= '    <td>' . $key . '</td>';
+        $tabelabody4 .= '    <td>' . $nomes . '</td>';
+        $tabelabody4 .= '  </tr>';
+        $tabelafinal4 .= '</tbody>';
+        $tabelafinal4 .= '</table>';
+        $y++;
+    }
+}
 
 //printa as tabelas
 echo "<h1>Tabela para orçamento</h1>";
@@ -172,4 +218,7 @@ echo $tabela2 . $tabelabody2 . $tabelafinal2;
 echo "<br>";
 echo "<h1>Tabela de preço</h1>";
 echo $tabela . $tabelabody . $tabelafinal;
+echo "<br>";
+echo "<h1>Tabela de itens que faltam</h1>";
+echo $tabela4 . $tabelabody4 . $tabelafinal4;
 echo "<br>";
